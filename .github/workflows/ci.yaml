@@ -1,10 +1,11 @@
 name: Golang Docker Build
 
 on:
-  # LET THE PIPELINE TRIGGER ON A PUSH TO ALL BRANCHES
   push:
     branches:
       - "**"
+  release:
+    types: [published]
 
 env:
   CONTAINER_REPOSITORY: quay.io/felix_fransen # PUT YOUR OWN USERNAME HERE
@@ -30,6 +31,12 @@ jobs:
         id: meta
         with:
           images: ${{ env.CONTAINER_REPOSITORY }}/${{ env.CONTAINER_IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+            type=sha
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
